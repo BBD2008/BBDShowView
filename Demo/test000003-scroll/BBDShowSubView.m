@@ -8,6 +8,8 @@
 
 #import "BBDShowSubView.h"
 
+#define TitleBackgroundHeight 30
+
 @interface BBDShowSubView ()
 
 @property (nonatomic, weak) UILabel *titleLabel;
@@ -69,6 +71,36 @@
     
     // 在此控制子控件的frame
     self.backgroundImageView.frame = self.bounds;
+    // 刷新子控件
+    [self refreshSubviewsWithSelfFrame:frame];
+}
+
+#pragma mark 刷新子控件布局
+- (void)refreshSubviewsWithSelfFrame:(CGRect)frame
+{
+    if (self.showModel.title != nil && self.showModel.title.length > 0)
+    {
+        // 配置label底色
+        UIView *tempBackground = [UIView new];
+        self.titleBackground = tempBackground;
+        [self addSubview:self.titleBackground];
+        
+        self.titleBackground.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.7];
+        
+        self.titleBackground.frame = CGRectMake(0, frame.size.height - TitleBackgroundHeight, frame.size.width, TitleBackgroundHeight);
+        
+        // 配置label
+        UILabel *tempLabel = [UILabel new];
+        self.titleLabel = tempLabel;
+        [self addSubview:self.titleLabel];
+        
+        self.titleLabel.text = [@"  " stringByAppendingString:self.showModel.title];
+        self.titleLabel.font = [UIFont systemFontOfSize:16];
+        
+        self.titleLabel.frame = self.titleBackground.frame;
+        
+        
+    }
 }
 
 
