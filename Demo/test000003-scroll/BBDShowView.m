@@ -26,6 +26,9 @@
 
 // 用来记录所有子界面
 @property (nonatomic, copy) NSArray *subViewArray;
+// 用来显示背景图
+@property (nonatomic, weak) UIImageView *backgroundImageView;
+
 
 @end
 
@@ -37,7 +40,7 @@
 {
     // 初始化基本控制属性
     self.maxScale = subViewScale;
-    self.minScale = subViewScale - 0.3;// 此处控制 最小缩放比例!!!
+    self.minScale = subViewScale - 0.2;// 此处控制 最小缩放比例!!!
     
     // 求子控件初始尺寸（先给个和屏幕一样宽的，后期再去缩放）
     CGFloat originSubViewWidth = ScreenWidth;
@@ -58,12 +61,12 @@
         self.showModelArray = showModelArray;
         
         self.showsVerticalScrollIndicator = NO;
-        //self.showsHorizontalScrollIndicator = NO;
+        self.showsHorizontalScrollIndicator = NO;
         self.scrollEnabled = YES;
         self.pagingEnabled = YES;
         self.clipsToBounds = NO;
         self.bounces = NO;
-        self.backgroundColor = [UIColor whiteColor];//背景颜色在此设置
+        self.backgroundColor = [UIColor clearColor];//背景颜色在此设置
         
         self.delegate = self;
     }
@@ -85,7 +88,7 @@
     for (int i = 0; i < showModelArray.count; i++)
     {
         BBDShowSubView *subView = [BBDShowSubView showSubViewWithShowModel:showModelArray[i]];
-        subView.backgroundColor = [UIColor colorWithHue:RandomLessOne saturation:RandomLessOneMoreHalf brightness:1.0 alpha:1.0];// 随机背景色，测试使用
+        subView.backgroundColor = [UIColor colorWithHue:RandomLessOne saturation:RandomLessOneMoreHalf brightness:1.0 alpha:0.7];// 随机背景色，测试使用
         
         // 设置子控件subView
         CGFloat x = i * self.subViewSize.width;
@@ -168,7 +171,7 @@
             BBDShowSubView *leftSubView = self.subViewArray[currentIndex - 1];
             
             CGAffineTransform transformScale = CGAffineTransformMakeScale(self.minScale, self.minScale);
-            CGFloat tx = ScreenWidth * (1 - self.maxScale + 1 - self.minScale) - (ScreenWidth * (1 - self.maxScale) * 0.5);
+            CGFloat tx = ScreenWidth * (1 - self.maxScale + 1 - self.minScale) * 0.5 / leftSubView.scale - (ScreenWidth * (1 - self.maxScale) * 0.3);
             CGAffineTransform transformFinal = CGAffineTransformTranslate(transformScale, tx, 0);
             [UIView animateWithDuration:AnimateDurition animations:^
             {
@@ -181,7 +184,7 @@
             BBDShowSubView *leftSubView = self.subViewArray[currentIndex + 1];
             
             CGAffineTransform transformScale = CGAffineTransformMakeScale(self.minScale, self.minScale);
-            CGFloat tx = - (ScreenWidth * (1 - self.maxScale + 1 - self.minScale)) + (ScreenWidth * (1 - self.maxScale) * 0.5);
+            CGFloat tx = - ScreenWidth * (1 - self.maxScale + 1 - self.minScale) * 0.5 / leftSubView.scale + (ScreenWidth * (1 - self.maxScale) * 0.3);
             CGAffineTransform transformFinal = CGAffineTransformTranslate(transformScale, tx, 0);
             [UIView animateWithDuration:AnimateDurition animations:^
              {
@@ -200,8 +203,23 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    // 滚动结束后，播放位移动画
+    // 滚动动画结束后，播放位移动画
     [self playAnimateWithContentOffsetX:scrollView.contentOffset.x];
 }
 
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    // 滚动后,假如不需要decelerate,也要播放移位动画
+    if (decelerate == NO)
+    {
+        [self playAnimateWithContentOffsetX:scrollView.contentOffset.x];
+    }
+}
+
 @end
+
+
+
+
+
+
